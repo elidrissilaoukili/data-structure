@@ -1,0 +1,21 @@
+Binary Trees
+Binary Tree Properties
+
+Full Binary Tree: Every node has either 0 or 2 children.
+Complete Binary Tree: All levels are completely filled except possibly for the last level, filled from left to right.
+Perfect Binary Tree: A binary tree where all internal nodes have two children and all leaves are at the same level.
+
+
+                        Binary Tree Traversals
+In-order Traversal:
+    Traverse the left subtree, visit the root, then traverse the right subtree.
+
+Pre-order Traversal:
+    Visit the root, then traverse the left subtree and right subtree.
+
+Post-order Traversal:
+    Traverse the left subtree, right subtree, and then visit the root.
+
+Level-order Traversal:
+    Traverse nodes level by level, starting from the root.
+
