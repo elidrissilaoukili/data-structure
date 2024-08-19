@@ -1,163 +1,140 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Structure for a binary tree node
 struct treeNode {
     int data;
     struct treeNode *left;
     struct treeNode *right;
 };
 
-// Queue structure to help in level-order insertion
-struct Queue {
-    struct treeNode* node;
-    struct Queue* next;
-};
-
-struct Queue* createQueueNode(struct treeNode* node) {
-    struct Queue* newQueueNode = (struct Queue*)malloc(sizeof(struct Queue));
-    newQueueNode->node = node;
-    newQueueNode->next = NULL;
-    return newQueueNode;
-}
-
-void enqueue(struct Queue** front, struct Queue** rear, struct treeNode* node) {
-    struct Queue* newQueueNode = createQueueNode(node);
-    if (*rear == NULL) {
-        *front = *rear = newQueueNode;
-        return;
-    }
-    (*rear)->next = newQueueNode;
-    *rear = newQueueNode;
-}
-
-struct treeNode* dequeue(struct Queue** front, struct Queue** rear) {
-    if (*front == NULL) return NULL;
-    struct Queue* temp = *front;
-    *front = (*front)->next;
-    if (*front == NULL) *rear = NULL;
-    struct treeNode* node = temp->node;
-    free(temp);
+// Utility function to create a new tree node
+struct treeNode *createNode(int data) {
+    struct treeNode *node = (struct treeNode *)malloc(sizeof(struct treeNode));
+    node->data = data;
+    node->left = NULL;
+    node->right = NULL;
     return node;
 }
 
-int isQueueEmpty(struct Queue* front) {
-    return front == NULL;
-}
-
-struct treeNode* createNode(int value) {
-    struct treeNode *newNode = (struct treeNode*)malloc(sizeof(struct treeNode));
-    newNode->data = value;
-    newNode->left = NULL;
-    newNode->right = NULL;
-    return newNode;
-}
-
-struct treeNode* insertNode(struct treeNode* root, int data) {
-    struct treeNode* newNode = createNode(data);
-    if (root == NULL) return newNode;
-
-    struct Queue *front = NULL, *rear = NULL;
-    enqueue(&front, &rear, root);
-
-    while (!isQueueEmpty(front)) {
-        struct treeNode* temp = dequeue(&front, &rear);
-
-        if (temp->left == NULL) {
-            temp->left = newNode;
-            break;
-        } else {
-            enqueue(&front, &rear, temp->left);
-        }
-
-        if (temp->right == NULL) {
-            temp->right = newNode;
-            break;
-        } else {
-            enqueue(&front, &rear, temp->right);
-        }
+// Function to insert a new node with given data into the BST
+struct treeNode *insert(struct treeNode *node, int data) {
+    // If the tree is empty, return a new node
+    if (node == NULL) {
+        return createNode(data);
     }
 
+    // Otherwise, recur down the tree
+    if (data < node->data) {
+        node->left = insert(node->left, data);
+    } else if (data > node->data) {
+        node->right = insert(node->right, data);
+    }
+
+    // Return the (unchanged) node pointer
+    return node;
+}
+
+// Function to find the minimum value node in a given subtree
+struct treeNode *minValueNode(struct treeNode *node) {
+    struct treeNode *current = node;
+    // Loop down to find the leftmost leaf
+    while (current && current->left != NULL) {
+        current = current->left;
+    }
+    return current;
+}
+
+// Function to delete a node with given data from the BST
+struct treeNode *delete(struct treeNode *root, int data) {
+    // STEP 1: Perform standard BST delete
+    if (root == NULL) {
+        return root; // Node not found
+    }
+
+    // If the data to be deleted is smaller than the root's data, go left
+    if (data < root->data) {
+        root->left = delete(root->left, data);
+    }
+    // If the data to be deleted is larger than the root's data, go right
+    else if (data > root->data) {
+        root->right = delete(root->right, data);
+    }
+    // If data matches the root's data, this is the node to be deleted
+    else {
+        // Node with only one child or no child
+        if (root->left == NULL) {
+            struct treeNode *temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct treeNode *temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // Node with two children: Get the inorder successor (smallest in the right subtree)
+        struct treeNode *temp = minValueNode(root->right);
+
+        // Copy the inorder successor's content to this node
+        root->data = temp->data;
+
+        // Delete the inorder successor
+        root->right = delete(root->right, temp->data);
+    }
+
+    // Return the (potentially updated) root pointer
     return root;
 }
 
-void inOrderTraversal(struct treeNode* root) {
+// Function to print the binary tree in-order traversal
+void inOrder(struct treeNode *root) {
     if (root != NULL) {
-        inOrderTraversal(root->left);
-        printf("%d -> ", root->data);
-        inOrderTraversal(root->right);
+        inOrder(root->left);
+        printf("%d ", root->data);
+        inOrder(root->right);
+    }
+}
+void preOrder(struct treeNode *root) {
+    if (root != NULL) {
+        printf("%d ", root->data);
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+}
+void postOrder(struct treeNode *root) {
+    if (root != NULL) {
+        postOrder(root->right);
+        postOrder(root->left);
+        printf("%d ", root->data);
     }
 }
 
-void preOrderTraversal(struct treeNode* root) {
-    if (root != NULL) {
-        printf("%d -> ", root->data);
-        preOrderTraversal(root->left);
-        preOrderTraversal(root->right);
-    }
-}
-
-void postOrderTraversal(struct treeNode* root) {
-    if (root != NULL) {
-        postOrderTraversal(root->left);
-        postOrderTraversal(root->right);
-        printf("%d -> ", root->data);
-    }
-}
-
-
-void printtabs(int numbtabs)
-{
-     for (int i = 0; i < numbtabs; i++)
-          printf("\t");
-}
-
-void printtree(struct treeNode *root, int level)
-{
-     if (root == NULL)
-     {
-          printtabs(level);
-          printf("---<empty>---\n");
-          return;
-     }
-     printtabs(level);
-     printf("value = %d\n", root->data);
-     printtabs(level);
-     printf("left\n");
-
-     printtree(root->left, level + 1);
-     printtabs(level);
-     printf("right\n");
-
-     printtree(root->right, level + 1);
-     printtabs(level);
-     printf("DONE!\n");
-}
-
-
+// Main function to test the binary tree operations
 int main() {
     struct treeNode *root = NULL;
 
-    // Inserting nodes into the tree
-    int value[] = {43, 69, 35, 71, 70};
-    for (int i = 0; i < 5; i++)
-    {
-        root = insertNode(root, value[i]);
-    }
-    printtree(root, 0);
+    // Insert nodes
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 70);
+    root = insert(root, 60);
+    root = insert(root, 80);
 
-    // printf("In-order Traversal:\n");
-    // inOrderTraversal(root);
-    // printf("\n");
+    printf("In-order traversal of the binary tree:\n");
+    inOrder(root);
+    printf("\n");
 
-    // printf("Pre-order Traversal:\n");
-    // preOrderTraversal(root);
-    // printf("\n");
+    // Delete nodes
+    root = delete(root, 20);
+    root = delete(root, 30);
+    root = delete(root, 50);
 
-    // printf("Post-order Traversal:\n");
-    // postOrderTraversal(root);
-    // printf("\n");
-
-
+    printf("In-order traversal after deletion:\n");
+    inOrder(root);
+    printf("\n");
 
     return 0;
 }
