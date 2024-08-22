@@ -20,7 +20,7 @@ void push(int value)
 void pop()
 {
      if (top == -1)
-          printf("Underflow, Stack is empty§\n");
+          printf("Underflow, Stack is empty!\n");
      else
      {
           printf("%d deleted, ", stack[top]);
