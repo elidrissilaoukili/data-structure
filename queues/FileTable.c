@@ -11,63 +11,74 @@ typedef struct
     cle elements[MAX_FILE];
     int tete;
     int queue;
-} file;
+} File;
 
-file initialisation_file()
+File initialisation_file()
 {
-    file f;
+    File f;
     f.tete = 0;
     f.queue = -1;
     return f;
 }
 
-bool est_vide(file f)
+bool est_vide(File f)
 {
-    return (f.queue == 0);
+    return (f.queue == -1);  // Fixing the condition to check if the queue is empty
 }
 
-cle tete_file(file f)
-{
-    if (est_vide(f))
-    {
-        printf("file est vide!\n");
-        return -1;
-    }
-    f.elements[f.tete];
-}
-
-cle queue_file(file f)
+cle tete_file(File f)
 {
     if (est_vide(f))
     {
-        printf("file est vide!\n");
-        return -1;
+        printf("File est vide!\n");
+        return -1; // Indicate an error state
     }
-    return f.elements[f.queue];
+    return f.elements[f.tete]; // Returning the first element
 }
 
-file enfile(file f, cle e)
+cle queue_file(File f)
+{
+    if (est_vide(f))
+    {
+        printf("File est vide!\n");
+        return -1; // Indicate an error state
+    }
+    return f.elements[f.queue]; // Returning the last element
+}
+
+File enfile(File f, cle e)
 {
     if (f.queue + 1 == MAX_FILE)
-        printf("le file est plien\n");
+    {
+        printf("le File est plein\n");
+        return f; // Returning the unchanged queue
+    }
     f.queue++;
     f.elements[f.queue] = e;
     return f;
 }
 
-file defile(file f)
+File defile(File f)
 {
     if (est_vide(f))
-        printf("file est vide\n");
-    else
-        for (int i = f.tete; i < f.queue; i++)
-            f.elements[i] = f.elements[i + 1];
-        f.queue--;
+    {
+        printf("File est vide\n");
+        return f; // Returning the unchanged queue
+    }
+    f.tete++;
+    if (f.tete > f.queue) {  // Resetting the queue when all elements are dequeued
+        f.tete = 0;
+        f.queue = -1;
+    }
     return f;
 }
 
-void afficher_file(file f)
+void afficher_file(File f)
 {
+    if (est_vide(f)) {
+        printf("File est vide!\n");
+        return;
+    }
     for (int i = f.tete; i <= f.queue; i++)
     {
         printf("%d---", f.elements[i]);
@@ -77,7 +88,7 @@ void afficher_file(file f)
 
 int main()
 {
-    file f = initialisation_file();
+    File f = initialisation_file();
     f = enfile(f, 1);
     f = enfile(f, 2);
     f = enfile(f, 3);
@@ -87,4 +98,6 @@ int main()
 
     f = defile(f);
     afficher_file(f);
+    
+    return 0;
 }

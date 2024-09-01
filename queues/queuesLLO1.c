@@ -24,9 +24,7 @@ void enQueue(int value)
 {
     Queue *element = create_node(value);
     if (tail == NULL)
-    { // Queue is empty
         head = tail = element;
-    }
     else
     {
         tail->next = element;
@@ -43,13 +41,9 @@ void deQueue()
     }
     Queue *temp = head;
     if (head == tail)
-    { // Only one element in the queue
         head = tail = NULL;
-    }
     else
-    {
         head = head->next;
-    }
     free(temp);
 }
 
