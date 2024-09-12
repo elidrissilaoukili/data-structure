@@ -45,24 +45,14 @@ struct treeNode *minValueNode(struct treeNode *node) {
     return current;
 }
 
-// Function to delete a node with given data from the BST
 struct treeNode *delete(struct treeNode *root, int data) {
-    // STEP 1: Perform standard BST delete
-    if (root == NULL) {
-        return root; // Node not found
-    }
-
-    // If the data to be deleted is smaller than the root's data, go left
-    if (data < root->data) {
+    if (root == NULL)
+        return root; 
+    if (data < root->data) 
         root->left = delete(root->left, data);
-    }
-    // If the data to be deleted is larger than the root's data, go right
-    else if (data > root->data) {
+    else if (data > root->data) 
         root->right = delete(root->right, data);
-    }
-    // If data matches the root's data, this is the node to be deleted
     else {
-        // Node with only one child or no child
         if (root->left == NULL) {
             struct treeNode *temp = root->right;
             free(root);
@@ -72,18 +62,10 @@ struct treeNode *delete(struct treeNode *root, int data) {
             free(root);
             return temp;
         }
-
-        // Node with two children: Get the inorder successor (smallest in the right subtree)
         struct treeNode *temp = minValueNode(root->right);
-
-        // Copy the inorder successor's content to this node
         root->data = temp->data;
-
-        // Delete the inorder successor
         root->right = delete(root->right, temp->data);
     }
-
-    // Return the (potentially updated) root pointer
     return root;
 }
 
